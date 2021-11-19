@@ -15,6 +15,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>
 import sys
 import logging
+from os import getcwd
 from PyQt5 import QtCore, QtWidgets
 
 from irk.irk_window import Ui_MainWindow
@@ -53,7 +54,7 @@ class IrkWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.ui.QuitButton.clicked.connect(self.quit)
         self.ui.StartButton.clicked.connect(self.client_thread.start)
-        self.ui.StopButton.clicked.connect(self.client_thread.terminate)
+        self.ui.StopButton.clicked.connect(self.stop)
 
         self.client_thread.client.message_received.connect(self.ui.ChatArea.append)
         self.client_thread.client.message_sent.connect(self.ui.ChatArea.append)
@@ -107,11 +108,16 @@ class IrkWindow(QtWidgets.QMainWindow):
         self.client_thread.terminate()
         QtCore.QCoreApplication.instance().quit()
 
+    @QtCore.pyqtSlot()
+    def stop(self):
+        self.ui.ChannelList.clear()
+        self.client_thread.terminate()
+
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
 
-    root_directory = "/home/goose/.irk"
+    root_directory = getcwd()
     window = IrkWindow(root_directory)
 
     sys.exit(app.exec())
